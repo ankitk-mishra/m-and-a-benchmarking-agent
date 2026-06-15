@@ -173,8 +173,8 @@ def run_agentic_query(question, messages):
     Your goal is to write a strictly valid SQLite query to answer the user's question based on the provided database schema.
     
     CRITICAL RULES:
-    1. Output ONLY the raw SQL query. 
-    2. Do NOT add any explanations, markdown, or text before or after the query.
+    1. If the user asks a data question, output ONLY the raw SQL query. Do NOT add any explanations, markdown, or text before or after the query.
+    2. If the user sends a conversational greeting or thank you (e.g., "hello", "thanks"), output the exact string "CHAT:" followed by a short, polite response. Do NOT write SQL in this case.
     3. Use exact column names provided in the schema. Do NOT invent column names. Double-check which table a column belongs to.
     4. For string filtering in WHERE clauses, ALWAYS use the LIKE operator (e.g., WHERE column_name LIKE '%keyword%') to avoid case-sensitivity and trailing space errors. Do NOT use strict equality (=) for strings.
     5. If data needs to be filtered by a column in one table, but you need to return a column from a DIFFERENT table, you MUST use a SQL JOIN connecting them on a common column (like Project_Name). Refer to the relationship hints.
@@ -205,6 +205,11 @@ def run_agentic_query(question, messages):
             raw_response = call_cloud_api(formatted_prompt)
             if not raw_response:
                 return "⚠️ API execution returned an empty response. Verify your API key.", None
+                
+        # Handle conversational routing
+        if "CHAT:" in raw_response:
+            chat_msg = raw_response.split("CHAT:")[-1].strip()
+            return chat_msg, None
                 
         sql_query = extract_sql(raw_response)
         result_df = pd.read_sql_query(sql_query, conn)
