@@ -100,7 +100,6 @@ model_name = ""
 
 if engine_type == "Local Ollama":
     model_name = st.sidebar.text_input("Ollama Model Name", value="qwen2.5-coder:7b")
-    st.sidebar.info("💡 Ensure Ollama is running locally on your Mac.")
     
 elif engine_type == "Cloud API (Groq - Free)":
     api_key = st.sidebar.text_input("Groq API Key", type="password")
