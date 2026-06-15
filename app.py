@@ -12,7 +12,6 @@ from langchain_core.prompts import PromptTemplate
 # ==========================================
 st.set_page_config(page_title="M&A Benchmarking Agent", layout="wide")
 st.title("📊 Tech M&A Benchmarking AI")
-st.markdown("Proof of Concept: Local & Cloud-Ready Benchmarking Agent")
 
 # ==========================================
 # 2. DATABASE UTILITIES & RELATIONSHIP HINTS
@@ -220,7 +219,6 @@ def run_agentic_query(question, messages):
 # ==========================================
 # 5. CHAT INTERFACE & AUTO-VISUALIZATION
 # ==========================================
-st.header("Chat with your Data")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
