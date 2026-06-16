@@ -11,7 +11,7 @@ from langchain_core.prompts import PromptTemplate
 # 1. PAGE SETUP & CONFIGURATION
 # ==========================================
 st.set_page_config(page_title="M&A Benchmarking Agent", layout="wide")
-st.title("Tech M&A Benchmarking Tool")
+st.title("📊 Tech M&A Benchmarking AI")
 
 # ==========================================
 # 2. DATABASE UTILITIES & RELATIONSHIP HINTS
@@ -180,7 +180,6 @@ def call_cloud_api(prompt_text):
         }
         response = requests.post(url, headers=headers, json=payload)
         if response.status_code == 200:
-            # Extract text elements from Claude response payload
             return response.json()["content"][0]["text"]
         else:
             raise Exception(f"Anthropic API Error: {response.text}")
@@ -213,6 +212,15 @@ def run_agentic_query(question, messages):
     4. For string filtering in WHERE clauses, ALWAYS use the LIKE operator (e.g., WHERE column_name LIKE '%keyword%') to avoid case-sensitivity and trailing space errors. Do NOT use strict equality (=) for strings.
     5. If data needs to be filtered by a column in one table, but you need to return a column from a DIFFERENT table, you MUST use a SQL JOIN connecting them on a common column (like Project_Name). Refer to the relationship hints.
     6. CONTEXT AWARENESS: Read the CHAT HISTORY. If the user asks a follow-up question (like "for the same" or "what about pricing?"), you MUST apply the filters (e.g., specific Sector or Project) mentioned in the previous messages.
+    
+    FEW-SHOT EXAMPLES FOR CORRECT SQL JOINS:
+    - User Question: "Can you tell me what are the applications used in the real estate sector"
+      Correct SQL Query:
+      SELECT DISTINCT applications.Application_Name FROM applications JOIN primary_kpis ON applications.Project_Name = primary_kpis.Project_Name WHERE primary_kpis.Sector LIKE '%Real Estate%';
+      
+    - User Question: "can you give me IT Capex and IT Opex related data in the technology sector company of revenue less than or equal to $100 million"
+      Correct SQL Query:
+      SELECT cost_breakdown.IT_capex_m, cost_breakdown.IT_opex_m FROM cost_breakdown JOIN primary_kpis ON cost_breakdown.Project_Name = primary_kpis.Project_Name WHERE primary_kpis.Sector LIKE '%Technology%' AND primary_kpis.Revenue_m <= 100;
     
     SCHEMA:
     {schema}
