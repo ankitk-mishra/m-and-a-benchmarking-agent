@@ -11,7 +11,7 @@ from langchain_core.prompts import PromptTemplate
 # 1. PAGE SETUP & CONFIGURATION
 # ==========================================
 st.set_page_config(page_title="M&A Benchmarking Agent", layout="wide")
-st.title("📊 Tech M&A Benchmarking AI")
+st.title("Tech M&A Benchmarking Tool")
 
 # ==========================================
 # 2. DATABASE UTILITIES & RELATIONSHIP HINTS
