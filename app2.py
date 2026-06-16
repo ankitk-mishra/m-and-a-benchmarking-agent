@@ -11,7 +11,7 @@ from langchain_core.prompts import PromptTemplate
 # 1. PAGE SETUP & CONFIGURATION
 # ==========================================
 st.set_page_config(page_title="M&A Benchmarking Agent", layout="wide")
-st.title("Tech M&A Benchmarking Tool")
+st.title("📊 Tech M&A Benchmarking AI")
 
 # ==========================================
 # 2. DATABASE UTILITIES & RELATIONSHIP HINTS
@@ -204,11 +204,11 @@ def run_agentic_query(question, messages):
 
     prompt_template = """
     You are an expert Technology M&A data analyst. 
-    Your goal is to write a strictly valid SQLite query to answer the user's question based on the provided database schema.
+    Your goal is to help the user analyze database metrics or coordinate a pleasant, direct chat exchange.
     
     CRITICAL RULES:
-    1. Output ONLY the raw SQL query. 
-    2. Do NOT add any explanations, markdown, or text before or after the query.
+    1. If the user greets you (e.g., "hi", "hello", "hey"), thanks you, or asks who you are / what you can do, output the exact string "CHAT:" followed by a warm, professional greeting and introduce yourself as the "Tech M&A Benchmarking AI Assistant". Mention what tables/data models are available for you to query. Do NOT generate any SQL or attempt to query databases in this case.
+    2. If the user asks a structured data question, output ONLY the raw SQL query. Do NOT add any explanations, markdown, or conversational text before or after the query.
     3. Use exact column names provided in the schema. Do NOT invent column names. Double-check which table a column belongs to.
     4. For string filtering in WHERE clauses, ALWAYS use the LIKE operator (e.g., WHERE column_name LIKE '%keyword%') to avoid case-sensitivity and trailing space errors. Do NOT use strict equality (=) for strings.
     5. If data needs to be filtered by a column in one table, but you need to return a column from a DIFFERENT table, you MUST use a SQL JOIN connecting them on a common column (like Project_Name). Refer to the relationship hints.
@@ -222,7 +222,7 @@ def run_agentic_query(question, messages):
     
     USER QUESTION: {question}
     
-    SQL QUERY:
+    SQL QUERY (or CHAT: response):
     """
     
     prompt = PromptTemplate.from_template(prompt_template)
@@ -239,6 +239,11 @@ def run_agentic_query(question, messages):
             raw_response = call_cloud_api(formatted_prompt)
             if not raw_response:
                 return "⚠️ API execution returned an empty response. Verify your API key.", None
+                
+        # Handle conversational routing
+        if "CHAT:" in raw_response:
+            chat_msg = raw_response.split("CHAT:")[-1].strip()
+            return chat_msg, None
                 
         sql_query = extract_sql(raw_response)
         result_df = pd.read_sql_query(sql_query, conn)
